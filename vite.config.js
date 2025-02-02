@@ -4,6 +4,7 @@ import mkcert from "vite-plugin-mkcert";
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: "/nir-camera-webapp-sample/",
   server: {
     host: true,
     https: true
