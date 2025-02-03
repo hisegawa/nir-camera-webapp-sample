@@ -5,7 +5,6 @@ import styled from "styled-components";
 import { Camera } from "react-camera-pro";
 
 const Wrapper = styled.div`
-  border: 1px solid #f00;
   position: fixed;
   inset: 0;
   width: 100%;
@@ -100,23 +99,55 @@ const ChangeFacingCameraButton = styled(Button)`
 `;
 
 const ImagePreview = styled.div`
-  width: 120px;
-  height: 120px;
-  ${(props) => (props.image ? `background-image:  url(${props.image});` : "")}
+  width: 100%;
+  height: 100%;
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
+  ${(props) => (props.image ? `background-image:  url(${props.image});` : "")}
+  ${(props) =>
+    props.facingMode === "user" ? `transform: rotateY(180deg);` : ""}
+`;
 
+const ClosePreviewButton = styled(Button)`
+  background: url(https://img.icons8.com/?size=100&id=8112&format=png&color=000000);
+  background-position: center;
+  background-size: 40px;
+  background-repeat: no-repeat;
+  width: 40px;
+  height: 40px;
+  padding: 40px;
+  &:disabled {
+    opacity: 1;
+    cursor: default;
+  }
   @media (max-width: 400px) {
-    width: 50px;
-    height: 120px;
+    padding: 40px 5px;
   }
 `;
 
 function App() {
   const camera = useRef(null);
   const [numberOfCameras, setNumberOfCameras] = useState(0);
+  const [facingMode, setFacingMode] = useState("user");
   const [image, setImage] = useState(null);
+
+  if (image !== null) {
+    return (
+      <Wrapper>
+        <ImagePreview image={image} facingMode={facingMode} />
+        <Control>
+          <ClosePreviewButton
+            onClick={() => {
+              if (image) {
+                setImage(null);
+              }
+            }}
+          ></ClosePreviewButton>
+        </Control>
+      </Wrapper>
+    );
+  }
 
   return (
     <Wrapper>
@@ -124,9 +155,9 @@ function App() {
         ref={camera}
         aspectRatio="cover"
         numberOfCamerasCallback={setNumberOfCameras}
+        facingMode={facingMode}
       />
       <Control>
-        <ImagePreview image={image} />
         <TakePhotoButton
           onClick={() => {
             if (camera.current) {
@@ -141,6 +172,7 @@ function App() {
           onClick={() => {
             if (camera.current) {
               const result = camera.current.switchCamera();
+              setFacingMode(result);
               console.log(result);
             }
           }}
